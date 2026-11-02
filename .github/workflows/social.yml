@@ -1,0 +1,71 @@
+# ================================================================
+#  social.yml (aafx-runner) · الإصدار v2.0 · 2026-11-02
+#  آخر تعديل v2.0: المستودع العام — الكود من aafx-video الخاص · الطلب من ملف الحدث · نسخة تيك توك تُحذف فور النشر (يوم واحد كحد أقصى)
+#  v1.0: فيديو 4K لتحليلات الذهب على يوتيوب وتيك توك (social.py)
+# ================================================================
+name: AAFX Social (YouTube · TikTok)
+on:
+  repository_dispatch:
+    types: [make_social, tt_post]
+permissions:
+  contents: read
+  actions: write
+jobs:
+  yt:
+    if: ${{ github.event.action == 'make_social' && github.event.client_payload.yt != '' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+        with: { repository: Qutada/aafx-video, token: '${{ secrets.CORE_TOKEN }}', fetch-depth: 1 }
+      - run: sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg libraqm0 libfribidi0 > /dev/null
+      - uses: actions/setup-python@v5
+        with: { python-version: '3.12', cache: 'pip' }
+      - run: pip install -q -r requirements.txt
+      - env:
+          BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
+        run: python social.py yt
+  tt:
+    if: ${{ github.event.action == 'make_social' && github.event.client_payload.tt }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+        with: { repository: Qutada/aafx-video, token: '${{ secrets.CORE_TOKEN }}', fetch-depth: 1 }
+      - run: sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg libraqm0 libfribidi0 > /dev/null
+      - uses: actions/setup-python@v5
+        with: { python-version: '3.12', cache: 'pip' }
+      - run: pip install -q -r requirements.txt
+      - env:
+          BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
+        run: python social.py tt
+      - uses: actions/upload-artifact@v4
+        with:
+          name: tt_${{ github.event.client_payload.id }}
+          path: ttout/
+          retention-days: 1
+  tt_post:
+    if: ${{ github.event.action == 'tt_post' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with: { repository: Qutada/aafx-video, token: '${{ secrets.CORE_TOKEN }}', fetch-depth: 1 }
+      - uses: actions/download-artifact@v4
+        with:
+          name: tt_${{ github.event.client_payload.id }}
+          path: ttout/
+          run-id: ${{ github.event.client_payload.run }}
+          github-token: ${{ github.token }}
+      - uses: actions/setup-python@v5
+        with: { python-version: '3.12' }
+      - run: pip install -q requests
+      - env:
+          BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
+        run: python social.py tt_post
+      - name: حذف نسخة تيك توك المؤقتة
+        if: always()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          for a in $(gh api repos/${{ github.repository }}/actions/runs/${{ github.event.client_payload.run }}/artifacts --jq '.artifacts[].id'); do gh api -X DELETE repos/${{ github.repository }}/actions/artifacts/$a; done

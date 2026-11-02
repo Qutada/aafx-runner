@@ -1,0 +1,44 @@
+# ================================================================
+#  video.yml (aafx-runner) · الإصدار v2.0 · 2026-11-02
+#  آخر تعديل v2.0: المستودع العام aafx-runner (دقائق غير محدودة) — الكود والبيانات يُنزَّلان من المستودع الخاص aafx-video
+#             بمفتاح CORE_TOKEN · الطلب يُقرأ من ملف الحدث (لا يظهر في السجل العام) · بدون تشغيل يدوي (لا تظهر البيانات في الواجهة)
+#  v1.7: التشغيلات بالتوازي (مجموعة لكل طلب id)
+#  Secrets: BOT_TOKEN · CORE_TOKEN (قراءة/كتابة aafx-video) · TWELVE_KEY (اختياري)
+# ================================================================
+name: AAFX Video & Cards
+on:
+  repository_dispatch:
+    types: [make_video, make_card, make_welcome, make_ta]
+concurrency:
+  group: aafx-${{ github.event.action }}-${{ github.event.client_payload.id || github.run_id }}
+  cancel-in-progress: false
+permissions:
+  contents: write
+jobs:
+  video:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          repository: Qutada/aafx-video
+          token: ${{ secrets.CORE_TOKEN }}
+          fetch-depth: 1
+      - name: الأدوات
+        if: ${{ github.event.client_payload.mode != 'silent' }}
+        run: |
+          sudo apt-get update -qq
+          if [ "${{ github.event.action }}" = "make_welcome" ] || [ "${{ github.event.action }}" = "make_ta" ]; then sudo apt-get install -y -qq libraqm0 libfribidi0 > /dev/null; else sudo apt-get install -y -qq ffmpeg libraqm0 libfribidi0 > /dev/null; fi
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: 'pip'
+      - run: pip install -q -r requirements.txt
+      - name: التصميم والإرسال
+        env:
+          BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
+          GITHUB_TOKEN: ${{ github.token }}
+          CORE_TOKEN: ${{ secrets.CORE_TOKEN }}
+          DATA_REPO: Qutada/aafx-video
+          TWELVE_KEY: ${{ secrets.TWELVE_KEY }}
+        run: python ${{ github.event.action == 'make_card' && 'make_card.py' || github.event.action == 'make_welcome' && 'make_welcome.py' || github.event.action == 'make_ta' && 'make_ta.py' || 'make_video.py' }}
