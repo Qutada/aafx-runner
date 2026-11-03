@@ -1,6 +1,7 @@
 # ================================================================
-#  social.yml (aafx-runner) · الإصدار v2.0 · 2026-11-02
-#  آخر تعديل v2.0: المستودع العام — الكود من aafx-video الخاص · الطلب من ملف الحدث · نسخة تيك توك تُحذف فور النشر (يوم واحد كحد أقصى)
+#  social.yml (aafx-runner) · الإصدار v2.1 · 2026-11-03
+#  آخر تعديل v2.1: سجل فيديوهات يوتيوب في المستودع الخاص (CORE_TOKEN · DATA_REPO) للتطوير الذاتي
+#  v2.0: المستودع العام — الكود من aafx-video الخاص · الطلب من ملف الحدث · نسخة تيك توك تُحذف فور النشر (يوم واحد كحد أقصى)
 #  v1.0: فيديو 4K لتحليلات الذهب على يوتيوب وتيك توك (social.py)
 # ================================================================
 name: AAFX Social (YouTube · TikTok)
@@ -24,6 +25,8 @@ jobs:
       - run: pip install -q -r requirements.txt
       - env:
           BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
+          CORE_TOKEN: ${{ secrets.CORE_TOKEN }}
+          DATA_REPO: Qutada/aafx-video
         run: python social.py yt
   tt:
     if: ${{ github.event.action == 'make_social' && github.event.client_payload.tt }}
