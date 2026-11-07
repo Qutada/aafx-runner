@@ -1,6 +1,7 @@
 # ================================================================
-#  video.yml (aafx-runner) · الإصدار v2.3 · 2026-11-04
-#  آخر تعديل v2.3: حدث make_report ← تقرير نتائج بوت التداول الآلي (make_report.py)
+#  video.yml (aafx-runner) · الإصدار v2.4 · 2026-11-07
+#  آخر تعديل v2.4: حدث make_anachart ← محاكاة شارت التحليل إن لم تصل لقطة MT5 (make_anachart.py)
+#  v2.3: حدث make_report ← تقرير نتائج بوت التداول الآلي (make_report.py)
 #  v2.2: حدث make_learn ← التطوير الذاتي (learn.py): دقة المناطق وانتشار الفيديوهات + اقتراحات للموافقة
 #  v2.1: حدث make_guide ← «دليل استخدام البوت» PDF (make_guide.py · Chrome + خط الإيموجي)
 #  v2.0: المستودع العام aafx-runner (دقائق غير محدودة) — الكود والبيانات يُنزَّلان من المستودع الخاص aafx-video
@@ -11,7 +12,7 @@
 name: AAFX Video & Cards
 on:
   repository_dispatch:
-    types: [make_video, make_card, make_welcome, make_ta, make_guide, make_learn, make_report]
+    types: [make_video, make_card, make_welcome, make_ta, make_guide, make_learn, make_report, make_anachart]
 concurrency:
   group: aafx-${{ github.event.action }}-${{ github.event.client_payload.id || github.run_id }}
   cancel-in-progress: false
@@ -33,7 +34,7 @@ jobs:
           sudo apt-get update -qq
           if [ "${{ github.event.action }}" = "make_learn" ]; then exit 0; fi
           if [ "${{ github.event.action }}" = "make_guide" ]; then sudo apt-get install -y -qq fonts-noto-color-emoji > /dev/null; exit 0; fi
-          if [ "${{ github.event.action }}" = "make_welcome" ] || [ "${{ github.event.action }}" = "make_ta" ] || [ "${{ github.event.action }}" = "make_report" ]; then sudo apt-get install -y -qq libraqm0 libfribidi0 > /dev/null; else sudo apt-get install -y -qq ffmpeg libraqm0 libfribidi0 > /dev/null; fi
+          if [ "${{ github.event.action }}" = "make_welcome" ] || [ "${{ github.event.action }}" = "make_ta" ] || [ "${{ github.event.action }}" = "make_report" ] || [ "${{ github.event.action }}" = "make_anachart" ]; then sudo apt-get install -y -qq libraqm0 libfribidi0 > /dev/null; else sudo apt-get install -y -qq ffmpeg libraqm0 libfribidi0 > /dev/null; fi
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
@@ -46,4 +47,4 @@ jobs:
           CORE_TOKEN: ${{ secrets.CORE_TOKEN }}
           DATA_REPO: Qutada/aafx-video
           TWELVE_KEY: ${{ secrets.TWELVE_KEY }}
-        run: python ${{ github.event.action == 'make_card' && 'make_card.py' || github.event.action == 'make_welcome' && 'make_welcome.py' || github.event.action == 'make_ta' && 'make_ta.py' || github.event.action == 'make_guide' && 'make_guide.py' || github.event.action == 'make_learn' && 'learn.py' || github.event.action == 'make_report' && 'make_report.py' || 'make_video.py' }}
+        run: python ${{ github.event.action == 'make_card' && 'make_card.py' || github.event.action == 'make_welcome' && 'make_welcome.py' || github.event.action == 'make_ta' && 'make_ta.py' || github.event.action == 'make_guide' && 'make_guide.py' || github.event.action == 'make_learn' && 'learn.py' || github.event.action == 'make_report' && 'make_report.py' || github.event.action == 'make_anachart' && 'make_anachart.py' || 'make_video.py' }}
