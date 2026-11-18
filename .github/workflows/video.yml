@@ -13,7 +13,7 @@
 name: AAFX Video & Cards
 on:
   repository_dispatch:
-    types: [make_video, make_card, make_welcome, make_ta, make_guide, make_learn, make_report, make_anachart, make_cot]
+    types: [make_video, make_card, make_welcome, make_ta, make_guide, make_learn, make_report, make_anachart, make_cot, make_signal]
 concurrency:
   group: aafx-${{ github.event.action }}-${{ github.event.client_payload.id || github.run_id }}
   cancel-in-progress: false
@@ -35,7 +35,7 @@ jobs:
           sudo apt-get update -qq
           if [ "${{ github.event.action }}" = "make_learn" ]; then exit 0; fi
           if [ "${{ github.event.action }}" = "make_guide" ]; then sudo apt-get install -y -qq fonts-noto-color-emoji > /dev/null; exit 0; fi
-          if [ "${{ github.event.action }}" = "make_welcome" ] || [ "${{ github.event.action }}" = "make_ta" ] || [ "${{ github.event.action }}" = "make_report" ] || [ "${{ github.event.action }}" = "make_anachart" ] || [ "${{ github.event.action }}" = "make_cot" ]; then sudo apt-get install -y -qq libraqm0 libfribidi0 > /dev/null; else sudo apt-get install -y -qq ffmpeg libraqm0 libfribidi0 > /dev/null; fi
+          if [ "${{ github.event.action }}" = "make_welcome" ] || [ "${{ github.event.action }}" = "make_ta" ] || [ "${{ github.event.action }}" = "make_report" ] || [ "${{ github.event.action }}" = "make_anachart" ] || [ "${{ github.event.action }}" = "make_cot" ] || [ "${{ github.event.action }}" = "make_signal" ]; then sudo apt-get install -y -qq libraqm0 libfribidi0 > /dev/null; else sudo apt-get install -y -qq ffmpeg libraqm0 libfribidi0 > /dev/null; fi
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
@@ -48,4 +48,4 @@ jobs:
           CORE_TOKEN: ${{ secrets.CORE_TOKEN }}
           DATA_REPO: Qutada/aafx-video
           TWELVE_KEY: ${{ secrets.TWELVE_KEY }}
-        run: python ${{ github.event.action == 'make_card' && 'make_card.py' || github.event.action == 'make_welcome' && 'make_welcome.py' || github.event.action == 'make_ta' && 'make_ta.py' || github.event.action == 'make_guide' && 'make_guide.py' || github.event.action == 'make_learn' && 'learn.py' || github.event.action == 'make_report' && 'make_report.py' || github.event.action == 'make_anachart' && 'make_anachart.py' || github.event.action == 'make_cot' && 'make_cot.py' || 'make_video.py' }}
+        run: python ${{ github.event.action == 'make_card' && 'make_card.py' || github.event.action == 'make_welcome' && 'make_welcome.py' || github.event.action == 'make_ta' && 'make_ta.py' || github.event.action == 'make_guide' && 'make_guide.py' || github.event.action == 'make_learn' && 'learn.py' || github.event.action == 'make_report' && 'make_report.py' || github.event.action == 'make_anachart' && 'make_anachart.py' || github.event.action == 'make_cot' && 'make_cot.py' || github.event.action == 'make_signal' && 'make_signal.py' || 'make_video.py' }}
